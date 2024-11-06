@@ -12,8 +12,17 @@ def get_users():
 @main.route('/api/users', methods=['POST'])
 def create_user():
     data = request.get_json()
-    new_user = User(username=data['username'], email=data['email'])
-    new_user.set_password(data['password'])
-    db.session.add(new_user)
+    username = data.get('username')
+    email = data.get('email')
+    password = data.get('password')
+
+    if not username or not email or not password:
+        return jsonify({'error': 'Missing required fields'}), 400
+
+    user = User(username=username, email=email)
+    user.set_password(password)
+
+    db.session.add(user)
     db.session.commit()
+
     return jsonify({'message': 'User created successfully'}), 201
